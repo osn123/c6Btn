@@ -1,9 +1,10 @@
 #include <vector>
 #include <Btn.h>
-std::vector<Button> buttons = {0, 1, 2, 21, 17, 16, 23}; //
 #include <Leds.h>
-Leds leds;                                               // LEDインスタンス
 #include <Display.h>
+
+std::vector<Button> buttons = {0, 1, 2, 21, 17, 16, 23}; //
+Leds leds;                                               // LEDインスタンス
 Display display;
 
 // Button buttons[7] = {0, 1, 2, 21, 17, 16, 23}; // 7ボタン
@@ -24,7 +25,7 @@ void setup()
 void loop()
 {
   display.update();
-  leds.update();
+  leds.update(buttons);
 
   for (auto &btn : buttons)
   {
