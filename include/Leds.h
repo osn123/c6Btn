@@ -26,7 +26,7 @@ public:
     uint8_t status = 0;
 
     void start();
-    void update(const std::vector<Button> &btns);
+    void update(std::vector<Button> &btns);
 
     void setFlag(u8_t flag);
 
@@ -34,4 +34,5 @@ public:
     void clear(Adafruit_NeoPixel &pix);
     void redBtn();
     void clearBtn();
+    
 };

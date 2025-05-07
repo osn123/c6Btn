@@ -10,18 +10,18 @@ Display display;
 
 void setup()
 {
-  display.start();
-  leds.start();
-
   for (auto &btn : buttons)
   {
     btn.start();
   }
+  display.start(buttons);
+  leds.start();
+
 }
 
 void loop()
 {
-  display.update();
+  display.update(buttons);
   leds.update(buttons);
 
   for (auto &btn : buttons)

@@ -1,10 +1,13 @@
 #include "Btn.h"
 
-Button::Button(uint8_t p) : pin(p) {}
+Button::Button(uint8_t p) : pin(p), state(RELEASED), lastState(false), pressTime(0), m_shortClickEvent(false), m_longPressEvent(false)
+{
+}
 
 void Button::start()
 {
     pinMode(pin, INPUT_PULLUP);
+    lastState = !digitalRead(pin); // 現在の物理的な状態に基づいて lastState を初期化
 }
 
 void Button::update()
@@ -20,32 +23,65 @@ void Button::update()
         if (gauge > 0)
             gauge--;
     }
+
+    // 前回のサイクルのワンショットイベントをクリア
+    m_shortClickEvent = false;
+    m_longPressEvent = false;
+
     bool stable = (gauge == gaugeMax);
+
     if (stable && !lastState)
     {
+        // ボタンが押されたばかり
         state = PRESSED;
         pressTime = millis();
     }
     else if (!stable && lastState)
     {
-        if (state == LONG_PRESSED)
-            state = RELEASED;
-        else
-            state = RELEASED;
+        // ボタンが離されたばかり
+        if (state == PRESSED) // まだ LONG_PRESSED 状態でない場合
+        {
+            m_shortClickEvent = true; // ショートクリックイベントを設定
+        }
+        // 前の状態が PRESSED または LONG_PRESSED に関係なく、現在は RELEASED
+        state = RELEASED;
     }
-    else if (stable && lastState && (millis() - pressTime > longPressMs))
+    else if (stable && lastState && state == PRESSED) // ボタンが押され続けていて、PRESSED 状態だった場合
     {
-        state = LONG_PRESSED;
+        if (millis() - pressTime > longPressMs)
+        {
+            state = LONG_PRESSED;
+            m_longPressEvent = true; // ロングプレスイベントを設定
+        }
     }
     lastState = stable;
 }
 
-bool Button::isPressed() const
+bool Button::getShortClick()
 {
-    return state == PRESSED && state != LONG_PRESSED; // LONG_PRESSED のときは false を返す
+    if (m_shortClickEvent)
+    {
+        m_shortClickEvent = false; // イベントを消費
+        statusS++;
+        return true;
+    }
+    return false;
 }
 
-bool Button::isLongPressed() const
+bool Button::getLongPress()
 {
-    return state == LONG_PRESSED;
+    if (m_longPressEvent)
+    {
+        statusL++;
+        m_longPressEvent = false; // イベントを消費
+        return true;
+    }
+    return false;
+}
+
+bool Button::isCurrentlyPressed() const
+{
+    // ボタンが物理的に押されているかどうかを確認するために使用できます。
+    // ショート/ロングプレスイベントに関係なく状態を確認します。
+    return (state == PRESSED || state == LONG_PRESSED);
 }

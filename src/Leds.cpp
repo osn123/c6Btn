@@ -12,23 +12,26 @@ void Leds::start()
     pixelsBtn.show();
 }
 
-void Leds::update(const std::vector<Button> &btns)
+void Leds::update(std::vector<Button> &btns) // Note: Pass by non-const reference if Button methods modify state (like consuming events)
 {
-    if (btns[0].isPressed())
+    // Example for btns[0]
+    if (btns[0].getLongPress()) // Check for long press event first
     {
-        hsv(hue, sat, val, pixels);
+        clear(pixels); // Action for long press
     }
-    else if (btns[0].isLongPressed())
+    else if (btns[0].getShortClick()) // Only if not a long press, check for short click event
     {
-        clear(pixels);
+        hsv(hue, sat, val, pixels); // Action for short click
     }
-    if (btns[1].isPressed())
+
+    // Example for btns[1]
+    if (btns[2].getLongPress())
     {
-        hsv(hue * hue, sat * 2, val * 2, pixelsBtn);
+        clear(pixelsBtn); // Action for long press
     }
-    else if (btns[1].isLongPressed())
+    else if (btns[2].getShortClick())
     {
-        clear(pixelsBtn);
+        hsv(hue * hue, sat * 2, val * 2, pixelsBtn); // Action for short click
     }
 }
 void Leds::setFlag(u8_t flag)
