@@ -8,6 +8,7 @@
 #define PIN 18       // 1つ目のNeoPixelのデータピン
 #define PIN2 22      // 2つ目のNeoPixelのデータピン
 
+
 class Leds
 {
 public:

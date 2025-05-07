@@ -3,13 +3,10 @@
 #include <Leds.h>
 #include <Display.h>
 
-std::vector<Button> buttons = {0, 1, 2, 21, 17, 16, 23}; //
-Leds leds;                                               // LEDインスタンス
+std::vector<Button>
+    buttons = {0, 1, 2, 21, 17, 16, 23}; //
+Leds leds;                               // LEDインスタンス
 Display display;
-
-// Button buttons[7] = {0, 1, 2, 21, 17, 16, 23}; // 7ボタン
-// --- インスタンス生成 ---
-
 
 void setup()
 {

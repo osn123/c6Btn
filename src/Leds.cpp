@@ -36,7 +36,6 @@ void Leds::setFlag(u8_t flag)
     status |= flag; // フラグをON
 }
 
-
 void Leds::hsv(u8_t h, u8_t s, u8_t v, Adafruit_NeoPixel &pix)
 {
     for (uint16_t i = 0; i < pix.numPixels(); i++)
