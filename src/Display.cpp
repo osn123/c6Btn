@@ -16,18 +16,57 @@ void Display::start(std::vector<Button> &btns)
     lcd.setTextColor(SSD1306_WHITE); // 文字色を白に設定
     lcd.display();                   // 画面に反映
 }
+
 void Display::update(std::vector<Button> &btns)
 {
-    if (millis() - preMillis >= FPS) // 定期的な表示更新（50ms間隔）
+    if (btns[4].getLongPress())
     {
-        disp_mode(btns);
-        preMillis = millis(); // 時間を更新
+    }
+    switch (btns[4].statusL % 3)
+    {
+    case 0:
+        if (millis() - preMillis >= FPS) // 定期的な表示更新（50ms間隔）
+        {
+
+            disp_mode(btns);
+            preMillis = millis(); // 時間を更新
+        }
+        // 状態0の処理
+        break;
+    case 1:
+        // 状態1の処理
+        handleAnimation(btns);
+        break;
+    case STATE_2:
+        // 状態2の処理
+        rewrite(btns);
+        break;
+        ;
+
+    default:
+
+        // デフォルトの処理
+        break;
     }
 
     // 状態更新メソッド
     // 必要な処理をここに記述;
     // handleAnimation(btns);
+}
 
+void Display::rewrite(std::vector<Button> &btns)
+{
+
+    if (millis() - preMillis >= FPS) // 定期的な表示更新（50ms間隔）
+    {
+        lcd.clearDisplay();                           // 表示クリア
+        lcd.setTextSize(2);                           // 文字サイズ（2）
+        lcd.setCursor(8, 4);                          // 表示開始位置
+        lcd.println("Ver" + String(btns[4].statusL)); // モード番号を表示
+
+        lcd.display();        // 表示実行
+        preMillis = millis(); // 時間を更新
+    }
 }
 
 void Display::drawAnimationBars()
@@ -39,10 +78,10 @@ void Display::drawAnimationBars()
 // 現在のモード情報をOLEDに表示する関数
 void Display::disp_mode(std::vector<Button> &btns) // 現在のモード情報をOLEDに表示する関数
 {
-    lcd.clearDisplay();                                              // 表示クリア
-    lcd.setTextSize(2);                                              // 文字サイズ（2）
-    lcd.setCursor(8, 4);                                             // 表示開始位置
-    lcd.println("Ver" + String(btns[0].statusS + btns[0].statusL)); // モード番号を表示
+    lcd.clearDisplay();                           // 表示クリア
+    lcd.setTextSize(2);                           // 文字サイズ（2）
+    lcd.setCursor(8, 4);                          // 表示開始位置
+    lcd.println("Ver" + String(btns[4].statusL)); // モード番号を表示
 
     lcd.setTextSize(1); // 文字サイズを1に変更
 
@@ -67,7 +106,7 @@ void Display::disp_mode(std::vector<Button> &btns) // 現在のモード情報�
     lcd.setCursor(62, 45);                        // カーソル位置を設定
     lcd.println("    pow " + String(buffer));     // 明るさの値を表示
 
-    //sprintf(buffer, "%3d", "ee");
+    // sprintf(buffer, "%3d", "ee");
     lcd.setCursor(62, 54);                    // カーソル位置を設定
     lcd.println("  speed " + String(buffer)); // 速度情報を表示
 
@@ -76,11 +115,11 @@ void Display::disp_mode(std::vector<Button> &btns) // 現在のモード情報�
 
 void Display::handleAnimation(std::vector<Button> &btns)
 {
-    unsigned long currentMillis = millis();                        // 現在の時間を取得
+    unsigned long currentMillis = millis();                   // 現在の時間を取得
     if (currentMillis - preMillis >= DISPLAY_UPDATE_INTERVAL) // 定期的な表示更新（500ms間隔）
     {
         drawAnimationBars();
-        lcd.display();                  // 表示実行
+        lcd.display();             // 表示実行
         preMillis = currentMillis; // 時間を更新
 
         if (animationCounter < MAX_ANIMATION_COUNT) // アニメーションカウンタの更新

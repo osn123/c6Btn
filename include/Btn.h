@@ -22,8 +22,8 @@ class Button
 
 public:
 
-    u8_t statusS= 0; // ボタンの状態を保持する変数
-    u8_t statusL = 0; // ボタンの状態を保持する変数
+     u8_t  statusS= 0; // ボタンの状態を保持する変数
+     u8_t statusL = 0; // ボタンの状態を保持する変数
 
     Button(uint8_t p);
     void start();

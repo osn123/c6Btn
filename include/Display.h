@@ -2,9 +2,7 @@
 #include <vector>
 #include "Btn.h"
 
-
 #include <Adafruit_SSD1306.h> // OLED ディスプレイ用ライブラリ
-
 
 #define SCREEN_WIDTH 128 // OLED 幅指定
 #define SCREEN_HEIGHT 64 // OLED 高さ指定
@@ -21,14 +19,29 @@ public:
     const int DISPLAY_UPDATE_INTERVAL = 500;  // ディスプレイ更新間隔（ミリ秒）
     const uint8_t MAX_ANIMATION_COUNT = 8;        // アニメーションの最大カウント
     const uint8_t BRIGHTNESS_MULTIPLIER = 10;     // 明るさの乗数
+    
+    enum State
+    {
+        STATE_0=0,
+        STATE_1,
+        STATE_2,
+        STATE_3,
+        STATE_4,
+        STATE_5,
+        STATE_6,
+        STATE_7
+    } state = STATE_0; // 現在の状態を保持する変数
 
     void start(std::vector<Button> &btns);
     void update(std::vector<Button> &btns);
+
+    void rewrite(std::vector<Button> &btns);
 
     void handleAnimation(std::vector<Button> &btns);
 
     void drawAnimationBars();
     void disp_mode(std::vector<Button> &btns) ;// 現在のモード情報をOLEDに表示する関数
+
 
     
 };

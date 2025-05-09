@@ -3,8 +3,14 @@
 #include <Leds.h>
 #include <Display.h>
 
-std::vector<Button>
-    buttons = {0, 1, 2, 21, 17, 16, 23}; //
+// std::vector<Button>
+// template <class T1>
+// using Vec = std::vector<T1>;
+// Vec<Button> buttons = {0, 1, 2, 21, 17, 16, 23}; //
+
+using Vec = std::vector<Button>;
+Vec buttons = {0, 1, 2, 21, 17, 16, 23}; //
+
 Leds leds;                               // LEDインスタンス
 Display display;
 
