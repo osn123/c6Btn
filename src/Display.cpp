@@ -14,35 +14,37 @@ void Display::start(std::vector<Button> &btns)
             ; // 無限ループ
     }
     lcd.setTextColor(SSD1306_WHITE); // 文字色を白に設定
-    lcd.clearDisplay();              // 画面をクリア
+  //  lcd.clearDisplay();              // 画面をクリア
     lcd.display();                   // 画面に反映
 }
 
 void Display::update(std::vector<Button> &btns)
 {
-    state = static_cast<Display::State>(btns[4].statusL % 3); // ボタンの状態を取得
-    state2 = static_cast<Display::State>(btns[4].statusS % 3); // ボタンの状態を取得
-    stateSum = static_cast<Display::State>((btns[4].statusL% 3)*10 + btns[4].statusS% 3); // ボタンの状態を取得
+    state = static_cast<Display::State>(btns[4].statusL % 3 + 1);                                     // ボタンの状態を取得
+    state2 = static_cast<Display::State>(btns[4].statusS % 3 + 1);                                    // ボタンの状態を取得
+    stateSum = static_cast<Display::State>((btns[4].statusL % 3 + 1) * 10 + btns[4].statusS % 3 + 1); // ボタンの状態を取得
 
-    if (btns[4].getLongPress()||btns[4].getShortClick())
-    { 
+    if (btns[4].getLongPress() || btns[4].getShortClick())
+    {
     }
 
     switch (state2)
     {
     case 0:
+        break;
+    case 1:
         if (millis() - preMillis >= FPS) // 定期的な表示更新（50ms間隔）
         {
             disp_mode_full_update(btns); // フルアップデート版を呼び出す
-            preMillis = millis(); // 時間を更新
+            preMillis = millis();        // 時間を更新
         }
         // 状態0の処理
         break;
-    case 1:
+    case 2:
         // 状態1の処理 (アニメーション)
         handleAnimationState(btns);
         break;
-    case STATE_2:
+    case STATE_3:
         // 状態2の処理
         rewrite(btns);
         break;
@@ -58,9 +60,9 @@ void Display::rewrite(std::vector<Button> &btns)
 
     if (millis() - preMillis >= FPS) // 定期的な表示更新（50ms間隔）
     {
-        lcd.clearDisplay();                 // 表示クリア
-        lcd.setTextSize(2);                 // 文字サイズ（2）
-        lcd.setCursor(8, 4);                // 表示開始位置
+        lcd.clearDisplay();                    // 表示クリア
+        lcd.setTextSize(2);                    // 文字サイズ（2）
+        lcd.setCursor(8, 4);                   // 表示開始位置
         lcd.println("Ver" + String(stateSum)); // モード番号を表示
 
         lcd.setTextSize(1); // 文字サイズを1に変更
@@ -82,8 +84,8 @@ void Display::rewrite(std::vector<Button> &btns)
 // モード情報描画のコアロジック (クリアや表示なし)
 void Display::drawModeInfo(std::vector<Button> &btns)
 {
-    lcd.setTextSize(2);                 // 文字サイズ（2）
-    lcd.setCursor(8, 4);                // 表示開始位置
+    lcd.setTextSize(2);                    // 文字サイズ（2）
+    lcd.setCursor(8, 4);                   // 表示開始位置
     lcd.println("Ver" + String(stateSum)); // モード番号を表示
 
     lcd.setTextSize(1); // 文字サイズを1に変更
@@ -112,7 +114,6 @@ void Display::drawModeInfo(std::vector<Button> &btns)
     // sprintf(buffer, "%3d", "ee");
     lcd.setCursor(62, 54);                    // カーソル位置を設定
     lcd.println("  speed " + String(buffer)); // 速度情報を表示
-
 }
 
 // 現在のモード情報をOLEDに表示する関数 (クリアと表示込み)
@@ -120,7 +121,7 @@ void Display::disp_mode_full_update(std::vector<Button> &btns)
 {
     lcd.clearDisplay(); // 表示クリア
     drawModeInfo(btns); // モード情報を描画
-    lcd.display(); // 表示実行
+    lcd.display();      // 表示実行
 }
 
 void Display::drawAnimationBarElements() // アニメーションバーの要素のみ描画
@@ -141,7 +142,7 @@ void Display::handleAnimationState(std::vector<Button> &btns)
             animationCounter++;
         }
         else
-        { // カウンタをリセット
+        {                         // カウンタをリセット
             animationCounter = 0; // カウンタをリセット
         }
         preMillisAnimationCounter = currentMillis; // アニメーションカウンタ用の時間を更新
@@ -150,10 +151,10 @@ void Display::handleAnimationState(std::vector<Button> &btns)
     // 画面表示の更新ロジック (FPS間隔)
     if (currentMillis - preMillis >= FPS)
     {
-        lcd.clearDisplay(); // 最初に画面をクリア
-        drawModeInfo(btns); // モード情報をバッファに描画
+        lcd.clearDisplay();         // 最初に画面をクリア
+        drawModeInfo(btns);         // モード情報をバッファに描画
         drawAnimationBarElements(); // アニメーションバーをバッファに描画
-        lcd.display(); // バッファの内容を一度に表示
-        preMillis = currentMillis; // 画面表示更新用の時間を更新
+        lcd.display();              // バッファの内容を一度に表示
+        preMillis = currentMillis;  // 画面表示更新用の時間を更新
     }
 }
