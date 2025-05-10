@@ -1,60 +1,55 @@
 #include "Btn.h"
 
-Button::Button(uint8_t p) : pin(p), state(RELEASED), lastState(false), pressTime(0), m_shortClickEvent(false), m_longPressEvent(false)
+Button::Button(uint8_t p)
+    : pin(p), state(RELEASED), lastState(false), pressTime(0), m_shortClickEvent(false), m_longPressEvent(false)
 {
 }
 
 void Button::start()
 {
-    pinMode(pin, INPUT_PULLUP);
-    lastState = !digitalRead(pin); // 現在の物理的な状態に基づいて lastState を初期化
+    pinMode(pin, INPUT_PULLUP); // ピンをプルアップ入力に設定
+    lastState = !digitalRead(pin); // 現在の物理状態でlastStateを初期化
 }
 
 void Button::update()
 {
-    bool reading = !digitalRead(pin); // プルアップなので反転
+    bool reading = !digitalRead(pin); // プルアップなので論理を反転
     if (reading)
     {
-        if (gauge < gaugeMax)
-            gauge++;
+        if (gauge < gaugeMax) gauge++; // 押されていればゲージを増加
     }
     else
     {
-        if (gauge > 0)
-            gauge--;
+        if (gauge > 0) gauge--; // 離されていればゲージを減少
     }
 
-    // 前回のサイクルのワンショットイベントをクリア
-    m_shortClickEvent = false;
-    m_longPressEvent = false;
+    m_shortClickEvent = false; // 前回のショートクリックイベントをクリア
+    m_longPressEvent = false;  // 前回のロングプレスイベントをクリア
 
-    bool stable = (gauge == gaugeMax);
+    bool stable = (gauge == gaugeMax); // ゲージが最大なら安定とみなす
 
     if (stable && !lastState)
     {
-        // ボタンが押されたばかり
-        state = PRESSED;
-        pressTime = millis();
+        state = PRESSED; // ボタンが押されたばかり
+        pressTime = millis(); // 押された時刻を記録
     }
     else if (!stable && lastState)
     {
-        // ボタンが離されたばかり
-        if (state == PRESSED) // まだ LONG_PRESSED 状態でない場合
+        if (state == PRESSED)
         {
-            m_shortClickEvent = true; // ショートクリックイベントを設定
+            m_shortClickEvent = true; // ショートクリックイベントをセット
         }
-        // 前の状態が PRESSED または LONG_PRESSED に関係なく、現在は RELEASED
-        state = RELEASED;
+        state = RELEASED; // 状態をリリースに戻す
     }
-    else if (stable && lastState && state == PRESSED) // ボタンが押され続けていて、PRESSED 状態だった場合
+    else if (stable && lastState && state == PRESSED)
     {
         if (millis() - pressTime > longPressMs)
         {
-            state = LONG_PRESSED;
-            m_longPressEvent = true; // ロングプレスイベントを設定
+            state = LONG_PRESSED; // ロングプレス状態へ移行
+            m_longPressEvent = true; // ロングプレスイベントをセット
         }
     }
-    lastState = stable;
+    lastState = stable; // lastStateを更新
 }
 
 bool Button::getShortClick()
@@ -62,7 +57,7 @@ bool Button::getShortClick()
     if (m_shortClickEvent)
     {
         m_shortClickEvent = false; // イベントを消費
-        statusS++;
+        statusS++; // ショートクリック回数をカウント
         return true;
     }
     return false;
@@ -72,8 +67,8 @@ bool Button::getLongPress()
 {
     if (m_longPressEvent)
     {
-        statusL++;
         m_longPressEvent = false; // イベントを消費
+        statusL++; // ロングプレス回数をカウント
         return true;
     }
     return false;
@@ -81,7 +76,5 @@ bool Button::getLongPress()
 
 bool Button::isCurrentlyPressed() const
 {
-    // ボタンが物理的に押されているかどうかを確認するために使用できます。
-    // ショート/ロングプレスイベントに関係なく状態を確認します。
-    return (state == PRESSED || state == LONG_PRESSED);
+    return (state == PRESSED || state == LONG_PRESSED); // 現在押されているか判定
 }

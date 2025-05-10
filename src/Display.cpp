@@ -19,9 +19,11 @@ void Display::start(std::vector<Button> &btns)
 
 void Display::update(std::vector<Button> &btns)
 {
-    if (btns[4].getLongPress())
+    if (btns[4].getLongPress());
     {
     }
+
+    
     switch (btns[4].statusL % 3)
     {
     case 0:
@@ -63,6 +65,17 @@ void Display::rewrite(std::vector<Button> &btns)
         lcd.setTextSize(2);                           // 文字サイズ（2）
         lcd.setCursor(8, 4);                          // 表示開始位置
         lcd.println("Ver" + String(btns[4].statusL)); // モード番号を表示
+
+        lcd.setTextSize(1); // 文字サイズを1に変更
+
+        char buffer[8];                           // バッファの宣言
+        sprintf(buffer, "%3d", btns[0].statusS);  // 赤色の値をフォーマット
+        lcd.setCursor(62, 0);                     // カーソル位置を設定
+        lcd.println("    red " + String(buffer)); // 赤色の値を表示
+
+        sprintf(buffer, "%3d", btns[0].statusL);  // 緑色の値をフォーマット
+        lcd.setCursor(62, 9);                     // カーソル位置を設定
+        lcd.println("  green " + String(buffer)); // 緑色の値を表示
 
         lcd.display();        // 表示実行
         preMillis = millis(); // 時間を更新

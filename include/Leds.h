@@ -23,7 +23,7 @@ public:
         FLAG_C = (1 << 2)  // 00000100
     } FLAG;
 
-    uint8_t status = 0;
+    u8_t status = 0;
 
     void start();
     void update(std::vector<Button> &btns);

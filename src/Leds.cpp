@@ -25,11 +25,11 @@ void Leds::update(std::vector<Button> &btns) // Note: Pass by non-const referenc
     }
 
     // Example for btns[1]
-    if (btns[2].getLongPress())
+    if (btns[1].getLongPress())
     {
         clear(pixelsBtn); // Action for long press
     }
-    else if (btns[2].getShortClick())
+    else if (btns[1].getShortClick())
     {
         hsv(hue * hue, sat * 2, val * 2, pixelsBtn); // Action for short click
     }

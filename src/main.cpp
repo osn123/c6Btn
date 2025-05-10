@@ -11,7 +11,7 @@
 using Vec = std::vector<Button>;
 Vec buttons = {0, 1, 2, 21, 17, 16, 23}; //
 
-Leds leds;                               // LEDインスタンス
+Leds leds; // LEDインスタンス
 Display display;
 
 void setup()
@@ -23,10 +23,14 @@ void setup()
   display.start(buttons);
   leds.start();
 
+  Serial.begin(115200);
+  Serial.println("Hello, world!");
 }
 
 void loop()
 {
+  delay(1); // 時間待ち
+
   display.update(buttons);
   leds.update(buttons);
 
