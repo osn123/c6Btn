@@ -38,6 +38,7 @@ void Button::update()
         if (state == PRESSED)
         {
             m_shortClickEvent = true; // ショートクリックイベントをセット
+            statusS++; // ショートクリック回数をここでカウント
             notify(this);             // Observerに通知
         }
         state = RELEASED; // 状態をリリースに戻す
@@ -49,6 +50,7 @@ void Button::update()
         {
             state = LONG_PRESSED; // ロングプレス状態へ移行
             m_longPressEvent = true; // ロングプレスイベントをセット
+            statusL++; // ロングプレス回数をここでカウント
             notify(this);            // Observerに通知
         }
     }
@@ -60,7 +62,7 @@ bool Button::getShortClick()
     if (m_shortClickEvent)
     {
         m_shortClickEvent = false; // イベントを消費
-        statusS++; // ショートクリック回数をカウント
+        // statusS++; // ショートクリック回数をカウント
         return true;
     }
     return false;
@@ -71,7 +73,7 @@ bool Button::getLongPress()
     if (m_longPressEvent)
     {
         m_longPressEvent = false; // イベントを消費
-        statusL++; // ロングプレス回数をカウント
+        // statusL++; // ロングプレス回数をカウント
         return true;
     }
     return false;
