@@ -1,7 +1,8 @@
 #pragma once
 #include <Arduino.h>
+#include "ISubject.h" // ISubjectインターフェースをインクルード
 
-class Button
+class Button : public ISubject // ISubjectを継承
 {
     uint8_t pin;
     uint8_t gauge = 0;
@@ -31,6 +32,7 @@ public:
     bool getShortClick(); // True if a short click just occurred (consumes event)
     bool getLongPress();  // True if a long press just started (consumes event)
     bool isCurrentlyPressed() const; // Optional: To check if button is physically down
+    uint8_t getPin() const { return pin; } // Observerがボタンを識別するためのヘルパー
 
     
 };

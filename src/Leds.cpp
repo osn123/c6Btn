@@ -12,26 +12,30 @@ void Leds::start()
     pixelsBtn.show();
 }
 
-void Leds::update(std::vector<Button> &btns) // Note: Pass by non-const reference if Button methods modify state (like consuming events)
+void Leds::onNotify(Button* button)
 {
-    // Example for btns[0]
-    if (btns[0].getLongPress()) // Check for long press event first
-    {
-        clear(pixels); // Action for long press
-    }
-    else if (btns[0].getShortClick()) // Only if not a long press, check for short click event
-    {
-        hsv(hue, sat, val, pixels); // Action for short click
-    }
+    uint8_t notifiedPin = button->getPin();
 
-    // Example for btns[1]
-    if (btns[1].getLongPress())
+    // buttons[0] (ピン0) と buttons[1] (ピン1) に対応する処理
+    // main.cppでの初期化ピン番号を想定
+    if (notifiedPin == 0) // 元のbtns[0]に対応
     {
-        clear(pixelsBtn); // Action for long press
+        if (button->getLongPress()) // まずロングプレスイベントをチェック
+        {
+            clear(pixels); // ロングプレス時のアクション
+        }
+        else if (button->getShortClick()) // ロングプレスでなければショートクリックをチェック
+        {
+            hsv(hue, sat, val, pixels); // ショートクリック時のアクション
+        }
     }
-    else if (btns[1].getShortClick())
+    else if (notifiedPin == 1) // 元のbtns[1]に対応
     {
-        hsv(hue * hue, sat * 2, val * 2, pixelsBtn); // Action for short click
+        if (button->getLongPress()) {
+            clear(pixelsBtn);
+        } else if (button->getShortClick()) {
+            hsv(hue * hue, sat * 2, val * 2, pixelsBtn);
+        }
     }
 }
 void Leds::setFlag(u8_t flag)

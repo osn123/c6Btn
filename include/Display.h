@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Btn.h"
+#include "IObserver.h" // IObserverインターフェースをインクルード
 
 #include <Adafruit_SSD1306.h> // OLED ディスプレイ用ライブラリ
 
@@ -8,7 +9,7 @@
 #define SCREEN_HEIGHT 64 // OLED 高さ指定
 #define OLED_RESET -1    // リセット端子（未使用 -1）
 
-class Display{
+class Display : public IObserver { // IObserverを継承
 public:
     unsigned long preMillis = 0; // 前回の更新時間
     const long interval = 500;        // 更新間隔（500ms）
@@ -32,16 +33,19 @@ public:
         STATE_7
     } state = STATE_1, state2 = STATE_1, stateSum = STATE_0; // 現在の状態を保持する変数
 
-    void start(std::vector<Button> &btns);
-    void update(std::vector<Button> &btns);
+    Display(); // コンストラクタ
+    void start(std::vector<Button>* buttons_ptr_param); // Buttonベクターへのポインタを受け取る
+    // void update(std::vector<Button> &btns); // onNotifyとrefreshScreenに分割
 
-    void rewrite(std::vector<Button> &btns);
-
-    void handleAnimationState(std::vector<Button> &btns);
+    void onNotify(Button* button) override; // Observerの更新メソッド
+    void refreshScreen(); // 時間ベースの画面更新処理
 
 private:
+    std::vector<Button>* m_buttons_ptr = nullptr; // Buttonベクターへのポインタを保持
+
     void drawAnimationBarElements(); // アニメーションバーの要素を描画 (lcd.display()なし)
-    void drawModeInfo(std::vector<Button> &btns); // モード情報を描画 (lcd.clearDisplay() と lcd.display()なし)
-    void disp_mode_full_update(std::vector<Button> &btns) ;// 現在のモード情報をOLEDに表示する関数 (クリアと表示込み)
-   
+    void drawModeInfo(); // モード情報を描画 (m_buttons_ptrを使用)
+    void disp_mode_full_update(); // 現在のモード情報をOLEDに表示 (m_buttons_ptrを使用)
+    void rewrite(); // m_buttons_ptrを使用
+    void handleAnimationState(); // m_buttons_ptrを使用
 };

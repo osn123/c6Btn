@@ -38,15 +38,18 @@ void Button::update()
         if (state == PRESSED)
         {
             m_shortClickEvent = true; // ショートクリックイベントをセット
+            notify(this);             // Observerに通知
         }
         state = RELEASED; // 状態をリリースに戻す
     }
     else if (stable && lastState && state == PRESSED)
     {
-        if (millis() - pressTime > longPressMs)
+        // stateがPRESSEDからLONG_PRESSEDに遷移する場合
+        if (millis() - pressTime > longPressMs) 
         {
             state = LONG_PRESSED; // ロングプレス状態へ移行
             m_longPressEvent = true; // ロングプレスイベントをセット
+            notify(this);            // Observerに通知
         }
     }
     lastState = stable; // lastStateを更新

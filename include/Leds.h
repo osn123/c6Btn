@@ -2,6 +2,7 @@
 #include <Adafruit_NeoPixel.h>
 #include <vector> // std::vector を使用するために必要
 #include "Btn.h"  // Button 型を使用するために必要
+#include "IObserver.h" // IObserverインターフェースをインクルード
 
 #define NUMPIXELS 10 // 1つ目のNeoPixelのLED数
 #define NUMPIXELS2 7 // 2つ目のNeoPixelのLED数
@@ -9,7 +10,7 @@
 #define PIN2 22      // 2つ目のNeoPixelのデータピン
 
 
-class Leds
+class Leds : public IObserver // IObserverを継承
 {
 public:
     u8_t hue = 55;
@@ -26,7 +27,8 @@ public:
     u8_t status = 0;
 
     void start();
-    void update(std::vector<Button> &btns);
+    // void update(std::vector<Button> &btns); // onNotifyに置き換えられる
+    void onNotify(Button* button) override; // Observerの更新メソッド
 
     void setFlag(u8_t flag);
 

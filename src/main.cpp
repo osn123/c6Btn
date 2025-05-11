@@ -2,6 +2,8 @@
 #include <Btn.h>
 #include <Leds.h>
 #include <Display.h>
+// #include "IObserver.h" // 間接的にインクルードされる
+// #include "ISubject.h"  // 間接的にインクルードされる
 
 // std::vector<Button>
 // template <class T1>
@@ -20,8 +22,16 @@ void setup()
   {
     btn.start();
   }
-  display.start(buttons);
+  display.start(&buttons); // Displayにbuttonsベクターへのポインタを渡す
   leds.start();
+
+  // ObserverをSubjectに登録
+  // Ledsはbuttons[0] (ピン0) と buttons[1] (ピン1) を監視
+  buttons[0].attach(&leds);
+  buttons[1].attach(&leds);
+
+  // Displayはbuttons[4] (ピン17) を監視
+  buttons[4].attach(&display);
 
   Serial.begin(115200);
   Serial.println("Hello, world!");
@@ -31,8 +41,8 @@ void loop()
 {
   delay(1); // 時間待ち
 
-  display.update(buttons);
-  leds.update(buttons);
+  display.refreshScreen(); // Displayの時間ベースの画面更新
+  // leds.update(buttons); // LedsはonNotify経由で更新されるため不要
 
   for (auto &btn : buttons)
   {
