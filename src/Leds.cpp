@@ -12,7 +12,7 @@ void Leds::start()
     pixelsBtn.show();
 }
 
-void Leds::onNotify(Button* button)
+void Leds::onNotify(Button *button)
 {
     uint8_t notifiedPin = button->getPin();
 
@@ -26,15 +26,18 @@ void Leds::onNotify(Button* button)
         }
         else if (button->getShortClick()) // ロングプレスでなければショートクリックをチェック
         {
-            hsv(hue, sat, val, pixels); // ショートクリック時のアクション
+            hsv(hue, sat, val, pixels,button); // ショートクリック時のアクション
         }
     }
     else if (notifiedPin == 1) // 元のbtns[1]に対応
     {
-        if (button->getLongPress()) {
+        if (button->getLongPress())
+        {
             clear(pixelsBtn);
-        } else if (button->getShortClick()) {
-            hsv(hue * hue, sat * 2, val * 2, pixelsBtn);
+        }
+        else if (button->getShortClick())
+        {
+            hsv(hue, sat, val, pixelsBtn,button);
         }
     }
 }
@@ -43,12 +46,15 @@ void Leds::setFlag(u8_t flag)
     status |= flag; // フラグをON
 }
 
-void Leds::hsv(u8_t h, u8_t s, u8_t v, Adafruit_NeoPixel &pix)
+void Leds::hsv(u8_t h, u8_t s, u8_t v, Adafruit_NeoPixel &pix, Button *button)
 {
-    for (uint16_t i = 0; i < pix.numPixels(); i++)
-    {
-        pix.setPixelColor(i, pix.ColorHSV(h * h, s, v));
-    }
+    // for (uint16_t i = 0; i < pix.numPixels(); i++)
+    // {
+    //     pix.setPixelColor(i, pix.ColorHSV((i * 65536L) / pix.numPixels(), s, v));
+    // }
+
+    pix.setPixelColor(button->statusS % pix.numPixels(), pix.ColorHSV((button->statusS % pix.numPixels() * 65536L) / pix.numPixels(), s, v));
+
     pix.show();
 }
 
