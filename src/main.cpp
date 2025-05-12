@@ -41,6 +41,15 @@ void loop()
 {
   delay(1); // 時間待ち
 
+  if (Serial.available())
+  {
+    String cmd = Serial.readStringUntil('\n');
+    if (cmd == "reset")
+    {
+      ESP.restart();
+    }
+  }
+
   display.refreshScreen(); // Displayの時間ベースの画面更新
   // leds.update(buttons); // LedsはonNotify経由で更新されるため不要
 
