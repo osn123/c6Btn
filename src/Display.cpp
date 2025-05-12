@@ -39,6 +39,20 @@ void Display::onNotify(Button* notifiedButton)
         // 元の if (btns[4].getLongPress() || btns[4].getShortClick()) {} は空だったので、
         // ここで特別な処理がなければ、statusL/Sの参照だけで良い。
     }
+
+    if (notifiedButton->getPin() == 2 ) //
+    {
+        if (notifiedButton->getLongPress()) // まずロングプレスイベントをチェック
+        {
+             ESP.restart();
+        }
+        else if (notifiedButton->getShortClick()) // ロングプレスでなければショートクリックをチェック
+        {
+            ;
+        }
+        
+    }
+
 }
 void Display::refreshScreen() // 時間ベースの画面更新処理
 {

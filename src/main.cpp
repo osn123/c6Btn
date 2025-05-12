@@ -32,6 +32,7 @@ void setup()
 
   // Displayはbuttons[4] (ピン17) を監視
   buttons[4].attach(&display);
+  buttons[2].attach(&display);
 
   Serial.begin(115200);
   Serial.println("Hello, world!");
