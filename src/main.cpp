@@ -8,7 +8,6 @@
 // #include "driver/gpio.h"   // GPIO_NUM_x マクロのため
 // #include "driver/rtc_io.h" // RTC GPIO関連の関数 (rtc_gpio_pullup_enなど) のため
 
-
 // #include "IObserver.h" // 間接的にインクルードされる
 // #include "ISubject.h"  // 間接的にインクルードされる
 
@@ -43,7 +42,10 @@ void setup()
 
   // esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 0);
   // esp_deep_sleep_enable_gpio_wakeup(GPIO_NUM_2, ESP_GPIO_WAKEUP_GPIO_LOW);
-  esp_deep_sleep_enable_gpio_wakeup(2, ESP_GPIO_WAKEUP_GPIO_LOW); //TODO:　復帰ピンの設定がうまくいかない
+  esp_deep_sleep_enable_gpio_wakeup(2, ESP_GPIO_WAKEUP_GPIO_LOW); // TODO:　復帰ピンの設定がうまくいかない
+  
+  gpio_wakeup_enable(GPIO_NUM_2, GPIO_INTR_LOW_LEVEL); // GPIO2がLOWで復帰
+  esp_sleep_enable_gpio_wakeup(); // GPIO_NUM_2 (ピン2) をスリープ復帰ピンに設定
 
   Serial.begin(115200);
   Serial.println("Hello, world!");
@@ -64,6 +66,15 @@ void loop()
     {
       Serial.println("Deep Sleep");
       esp_deep_sleep_start();
+    }
+    else if (cmd == "lsp")
+    {
+      Serial.println("Light Sleep");
+      esp_light_sleep_start(); // ライトスリープ開始
+    }
+    else
+    {
+      Serial.println("Unknown command");
     }
   }
 
