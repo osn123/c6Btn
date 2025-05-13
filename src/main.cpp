@@ -2,6 +2,13 @@
 #include <Btn.h>
 #include <Leds.h>
 #include <Display.h>
+
+// #include "Arduino.h"     // Serial通信やdelayのため
+// #include "esp_sleep.h"   // esp_sleep_enable_ext0_wakeup, esp_deep_sleep_start のため
+// #include "driver/gpio.h"   // GPIO_NUM_x マクロのため
+// #include "driver/rtc_io.h" // RTC GPIO関連の関数 (rtc_gpio_pullup_enなど) のため
+
+
 // #include "IObserver.h" // 間接的にインクルードされる
 // #include "ISubject.h"  // 間接的にインクルードされる
 
@@ -34,6 +41,10 @@ void setup()
   buttons[4].attach(&display);
   buttons[2].attach(&display);
 
+  // esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 0);
+  // esp_deep_sleep_enable_gpio_wakeup(GPIO_NUM_2, ESP_GPIO_WAKEUP_GPIO_LOW);
+  esp_deep_sleep_enable_gpio_wakeup(2, ESP_GPIO_WAKEUP_GPIO_LOW); //TODO:　復帰ピンの設定がうまくいかない
+
   Serial.begin(115200);
   Serial.println("Hello, world!");
 }
@@ -45,9 +56,14 @@ void loop()
   if (Serial.available())
   {
     String cmd = Serial.readStringUntil('\n');
-    if (cmd == "reset")
+    if (cmd == "rst")
     {
       ESP.restart();
+    }
+    else if (cmd == "dsp")
+    {
+      Serial.println("Deep Sleep");
+      esp_deep_sleep_start();
     }
   }
 
