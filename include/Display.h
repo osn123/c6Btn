@@ -31,7 +31,7 @@ public:
         STATE_5,
         STATE_6,
         STATE_7
-    } state = STATE_1, state2 = STATE_1, stateSum = STATE_0; // 現在の状態を保持する変数
+    } state = STATE_0, state2 = STATE_0, stateSum = STATE_0; // 現在の状態を保持する変数
 
     Display(); // コンストラクタ
     void start(std::vector<Button>* buttons_ptr_param); // Buttonベクターへのポインタを受け取る
