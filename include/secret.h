@@ -1,0 +1,2 @@
+#define WIFI_SSID "HR01a-4C496A"
+#define WIFI_PASSWORD "b045bd52e7"

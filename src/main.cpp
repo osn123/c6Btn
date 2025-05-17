@@ -2,112 +2,89 @@
 #include <Btn.h>
 #include <Leds.h>
 #include <Display.h>
+#include "secret.h"
+#include <WiFi.h>
+#include <WebServer.h>
 
-// #include "Arduino.h"     // Serial通信やdelayのため
-// #include "esp_sleep.h"   // esp_sleep_enable_ext0_wakeup, esp_deep_sleep_start のため
-// #include "driver/gpio.h"   // GPIO_NUM_x マクロのため
-// #include "driver/rtc_io.h" // RTC GPIO関連の関数 (rtc_gpio_pullup_enなど) のため
-
-// #include "IObserver.h" // 間接的にインクルードされる
-// #include "ISubject.h"  // 間接的にインクルードされる
-
-// std::vector<Button>
-// template <class T1>
-// using Vec = std::vector<T1>;
-// Vec<Button> buttons = {0, 1, 2, 21, 17, 16, 23}; //
-
+// --- グローバル変数・インスタンス定義 ---
+WebServer server(80); // Webサーバー(ポート80)
 using Vec = std::vector<Button>;
-Vec buttons = {0, 1, 2, 21, 17, 16, 23}; //
+Vec buttons = {0, 1, 2, 21, 17, 16, 23}; // ボタン配列
 
-Leds leds; // LEDインスタンス
-Display display;
+Leds leds;      // LED制御インスタンス
+Display display; // OLED表示インスタンス
 
-void setup()
-{
-  for (auto &btn : buttons)
-  {
-    btn.start();
-  }
-  display.start(&buttons); // Displayにbuttonsベクターへのポインタを渡す
-  leds.start();
-
-  // ObserverをSubjectに登録
-  // Ledsはbuttons[0] (ピン0) と buttons[1] (ピン1) を監視
-  buttons[0].attach(&leds);
-  buttons[1].attach(&leds);
-
-  // Displayはbuttons[4] (ピン17) を監視
-  buttons[4].attach(&display);
-  buttons[2].attach(&display);
-
-  // esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 0);
-  // esp_deep_sleep_enable_gpio_wakeup(GPIO_NUM_2, ESP_GPIO_WAKEUP_GPIO_LOW);
-  esp_deep_sleep_enable_gpio_wakeup(2, ESP_GPIO_WAKEUP_GPIO_LOW); // TODO:　復帰ピンの設定がうまくいかない
-  
-  gpio_wakeup_enable(GPIO_NUM_2, GPIO_INTR_LOW_LEVEL); // GPIO2がLOWで復帰
-  esp_sleep_enable_gpio_wakeup(); // GPIO_NUM_2 (ピン2) をスリープ復帰ピンに設定
-
-  Serial.begin(115200);
-  Serial.println("Hello, world!");
+// --- Webサーバーハンドラ ---
+void handleRoot() {
+  server.send(200, "text/plain", "Hello from XIAO ESP32C6!");
 }
 
+// --- セットアップ ---
+void setup()
+{
+  // ボタン初期化
+  for (auto &btn : buttons) btn.start();
+
+  // ディスプレイ・LED初期化
+  display.start(&buttons);
+  leds.start();
+
+  // オブザーバ登録
+  buttons[0].attach(&leds); // LED制御用
+  buttons[1].attach(&leds);
+  buttons[4].attach(&display); // Display制御用
+  buttons[2].attach(&display);
+
+  // スリープ復帰ピン設定
+  esp_deep_sleep_enable_gpio_wakeup(2, ESP_GPIO_WAKEUP_GPIO_LOW);
+  gpio_wakeup_enable(GPIO_NUM_2, GPIO_INTR_LOW_LEVEL);
+  esp_sleep_enable_gpio_wakeup();
+
+  // シリアル通信
+  Serial.begin(115200);
+  Serial.println("Hello, world!");
+
+  // WiFi接続
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("\nWiFi connected");
+  Serial.println(WiFi.localIP());
+
+  // Webサーバー開始
+  server.on("/", handleRoot);
+  server.begin();
+  Serial.println("HTTP server started");
+}
+
+// --- メインループ ---
 void loop()
 {
-  delay(1); // 時間待ち
+  delay(1); // 負荷軽減用
 
+  server.handleClient(); // Webサーバー応答
+
+  // シリアルコマンド受付
   if (Serial.available())
   {
     String cmd = Serial.readStringUntil('\n');
-    if (cmd == "rst")
-    {
+    if (cmd == "rst") {
       ESP.restart();
-    }
-    else if (cmd == "dsp")
-    {
+    } else if (cmd == "dsp") {
       Serial.println("Deep Sleep");
       esp_deep_sleep_start();
-    }
-    else if (cmd == "lsp")
-    {
+    } else if (cmd == "lsp") {
       Serial.println("Light Sleep");
-      esp_light_sleep_start(); // ライトスリープ開始
-    }
-    else
-    {
+      esp_light_sleep_start();
+    } else {
       Serial.println("Unknown command");
     }
   }
 
-  display.refreshScreen(); // Displayの時間ベースの画面更新
-  // leds.update(buttons); // LedsはonNotify経由で更新されるため不要
+  display.refreshScreen(); // OLED画面更新
 
-  for (auto &btn : buttons)
-  {
-    btn.update();
-  }
-
-  // for (int i = 0; i < 7; i++)
-  // {
-  //   buttons[i].update();
-  // }
-
-  // ステートマシン例
-  // if (buttons[0].isPressed())
-  // {
-  //   leds.hsv(255, 255, 115, pixels);
-  // }
-  // else if (buttons[0].isLongPressed())
-  // {
-  //   leds.clear(pixels);
-  // }
-
-  // if (buttons[1].isPressed())
-  // {
-  //   leds.hsv(leds.hue, leds.sat , leds.val, pixelsBtn);
-  // }
-  // else if (buttons[1].isLongPressed())
-  // {
-  //   leds.clear(pixelsBtn);
-  // }
-  // 他ボタンも同様に
+  // ボタン状態更新
+  for (auto &btn : buttons) btn.update();
 }
